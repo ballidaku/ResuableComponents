@@ -32,6 +32,7 @@ public class MainScreen extends AppCompatActivity
     }
 
 
+
     public void relam(View v)
     {
         startActivity(new Intent(context, RealmActivity.class));
