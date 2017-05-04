@@ -10,12 +10,20 @@ public class MyConstants
     public static String DATA="data";
     public static String ID="id";
     public static String NAME="name";
+    public static String Twitter_User_NAME="twitter_user_name";
+    public static String Twitter_User_ID="twitter_user_id";
     public static String CREATED_TIME="created_time";
     public static String PICTURE="picture";
+    public static String FULL_PICTURE="full_picture";
     public static String TYPE="type";
     public static String LINK="link";
     public static String PHOTO="photo";
     public static String VIDEO="video";
     public static String STORY="story";
     public static String MESSAGE="message";
+
+
+    public static String IMAGE_URL="image_url";
+    public static String LIKE_COUNT="like_count";
+    public static String COMMENT_COUNT="comment_count";
 }

@@ -4,11 +4,20 @@
 
 
     <uses-permission android:name="android.permission.INTERNET"/>
+    <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE"/>
+    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE"/>
+
+    <!-- For android.media.audiofx.Visualizer -->
+    <uses-permission android:name="android.permission.RECORD_AUDIO"/>
+    <!-- We will request access to the camera, saying we require a camera
+     of some sort but not one with autofocus capability. -->
+    <uses-permission android:name="android.permission.CAMERA"/>
+    <uses-feature android:name="android.hardware.camera"/>
 
     <application
+        android:name=".MyApplication"
         android:allowBackup="true"
         android:icon="@mipmap/ic_launcher"
-        android:name=".MyApplication"
         android:label="@string/app_name"
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
@@ -24,10 +33,25 @@
 
         <activity android:name=".myRealm.RealmActivity"/>
         <activity android:name=".myFacebook.FacebookActivity"/>
+        <activity android:name=".myTwitter.TwitterActivity"/>
+        <activity android:name=".myInstagram.InstagramActivity"/>
+
+        <activity android:name=".myInstagram.AllMediaFiles" />
+        <activity android:name=".myInstagram.Relationship" />
+        <activity android:name="myInstagram.DashBoardActivty"/>
+
 
         <!--FACEBOOK-->
-        <meta-data android:name="com.facebook.sdk.ApplicationId" android:value="@string/facebook_app_id"/>
+        <meta-data android:name="com.facebook.sdk.ApplicationId"
+                   android:value="@string/facebook_app_id"/>
 
+        <provider android:name="com.facebook.FacebookContentProvider"
+                  android:authorities="com.facebook.app.FacebookContentProvider317329475352213"
+                  android:exported="true"/>
+
+        <meta-data
+            android:name="io.fabric.ApiKey"
+            android:value="a1462321ee345aea57524258b5f439542eb2c377"/>
     </application>
 
 </manifest>

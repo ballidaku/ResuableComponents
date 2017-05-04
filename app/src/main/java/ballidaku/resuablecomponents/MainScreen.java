@@ -7,7 +7,9 @@ import android.support.v7.app.AppCompatActivity;
 import android.view.View;
 
 import ballidaku.resuablecomponents.myFacebook.FacebookActivity;
+import ballidaku.resuablecomponents.myInstagram.InstagramActivity;
 import ballidaku.resuablecomponents.myRealm.RealmActivity;
+import ballidaku.resuablecomponents.myTwitter.TwitterActivity;
 
 /**
  * Created by brst-pc93 on 4/27/17.
@@ -41,5 +43,15 @@ public class MainScreen extends AppCompatActivity
     public void facebook(View v)
     {
         startActivity(new Intent(context, FacebookActivity.class));
+    }
+
+    public void twitter(View v)
+    {
+        startActivity(new Intent(context, TwitterActivity.class));
+    }
+
+    public void instagram(View v)
+    {
+        startActivity(new Intent(context, InstagramActivity.class));
     }
 }

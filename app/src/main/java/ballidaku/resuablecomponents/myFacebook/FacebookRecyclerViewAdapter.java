@@ -14,6 +14,8 @@ import java.util.ArrayList;
 import java.util.HashMap;
 
 import ballidaku.resuablecomponents.MyConstants;
+import ballidaku.resuablecomponents.MySharedPreference;
+import ballidaku.resuablecomponents.MyUtil;
 import ballidaku.resuablecomponents.R;
 import io.realm.Realm;
 
@@ -27,13 +29,15 @@ public class FacebookRecyclerViewAdapter  extends RecyclerView.Adapter<FacebookR
     Context context;
     Realm realm;
     ArrayList<HashMap<String,String>> mainArrayList;
+    MyUtil myUtil =new MyUtil();
 
     public class MyViewHolder extends RecyclerView.ViewHolder
     {
         public TextView textViewName;
         public TextView textCreatedTime;
         public TextView textMessage;
-        public ImageView imageView;
+        public ImageView imageViewUser;
+        public ImageView imageViewPost;
         //public WebView webView;
 
         public MyViewHolder(View view)
@@ -42,7 +46,8 @@ public class FacebookRecyclerViewAdapter  extends RecyclerView.Adapter<FacebookR
             textViewName = (TextView) view.findViewById(R.id.textViewName);
             textCreatedTime = (TextView) view.findViewById(R.id.textCreatedTime);
             textMessage = (TextView) view.findViewById(R.id.textMessage);
-            imageView = (ImageView) view.findViewById(R.id.imageView);
+            imageViewUser = (ImageView) view.findViewById(R.id.imageViewUser);
+            imageViewPost = (ImageView) view.findViewById(R.id.imageViewPost);
             //webView = (WebView) view.findViewById(R.id.webView);
 
         }
@@ -68,11 +73,24 @@ public class FacebookRecyclerViewAdapter  extends RecyclerView.Adapter<FacebookR
     public void onBindViewHolder(FacebookRecyclerViewAdapter.MyViewHolder holder, int position)
     {
 
+        setImage(holder.imageViewUser, MySharedPreference.getInstance().getUserImage(context));
+        holder.textViewName.setText(MySharedPreference.getInstance().getUserName(context));
+
+
         String story= mainArrayList.get(position).get(MyConstants.STORY);
         String name= mainArrayList.get(position).get(MyConstants.NAME);
 
-        holder.textViewName.setText(story.isEmpty() ? name : story);
-        holder.textCreatedTime.setText(""+mainArrayList.get(position).get(MyConstants.CREATED_TIME));
+
+        if((!story.isEmpty() || !name.isEmpty()) && !mainArrayList.get(position).get(MyConstants.TYPE).equals(MyConstants.LINK))
+        {
+            holder.textViewName.setText(story.isEmpty() ? name : story);
+        }
+
+
+
+
+
+        holder.textCreatedTime.setText(""+myUtil.ConvertFacebookTimeToDate(mainArrayList.get(position).get(MyConstants.CREATED_TIME)));
         holder.textMessage.setText(""+mainArrayList.get(position).get(MyConstants.MESSAGE));
 
 //        if(mainArrayList.get(position).get(MyConstants.TYPE).equals(MyConstants.LINK))
@@ -85,11 +103,14 @@ public class FacebookRecyclerViewAdapter  extends RecyclerView.Adapter<FacebookR
                 || mainArrayList.get(position).get(MyConstants.TYPE).equals(MyConstants.PHOTO)
                 || mainArrayList.get(position).get(MyConstants.TYPE).equals(MyConstants.VIDEO)))
         {
-            Picasso.with(context)
-                   .load(mainArrayList.get(position).get(MyConstants.PICTURE))
-                  // .resize(50, 50)
-                   //.centerCrop()
-                   .into(holder.imageView);
+
+            holder.imageViewPost.setVisibility(View.VISIBLE);
+
+            setImage(holder.imageViewPost,mainArrayList.get(position).get(MyConstants.FULL_PICTURE));
+        }
+        else
+        {
+            holder.imageViewPost.setVisibility(View.GONE);
         }
 
 
@@ -110,6 +131,16 @@ public class FacebookRecyclerViewAdapter  extends RecyclerView.Adapter<FacebookR
 
         notifyDataSetChanged();
 
+    }
+
+
+    public void setImage(ImageView imageView,String url)
+    {
+        Picasso.with(context)
+               .load(url)
+               // .resize(50, 50)
+               //.centerCrop()
+               .into(imageView);
     }
 
 

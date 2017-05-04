@@ -2,13 +2,19 @@ package ballidaku.resuablecomponents.myFacebook;
 
 import android.content.Context;
 import android.content.Intent;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
+import android.net.Uri;
 import android.os.Bundle;
+import android.os.Environment;
+import android.provider.MediaStore;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.View;
+import android.widget.Toast;
 
 import com.facebook.AccessToken;
 import com.facebook.AccessTokenTracker;
@@ -24,16 +30,25 @@ import com.facebook.Profile;
 import com.facebook.ProfileTracker;
 import com.facebook.login.LoginResult;
 import com.facebook.login.widget.LoginButton;
+import com.facebook.share.model.ShareLinkContent;
+import com.facebook.share.model.SharePhoto;
+import com.facebook.share.model.SharePhotoContent;
+import com.facebook.share.model.ShareVideo;
+import com.facebook.share.model.ShareVideoContent;
+import com.facebook.share.widget.ShareDialog;
 
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.io.File;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 
 import ballidaku.resuablecomponents.MyConstants;
+import ballidaku.resuablecomponents.MySharedPreference;
 import ballidaku.resuablecomponents.R;
 
 /**
@@ -57,6 +72,14 @@ public class FacebookActivity extends AppCompatActivity
 
     RecyclerView recyclerView;
     FacebookRecyclerViewAdapter facebookRecyclerViewAdapter;
+    Bitmap image;
+
+    ShareDialog shareDialog;
+
+
+    private Uri fileUri;
+    public static final int MEDIA_TYPE_VIDEO = 2;
+    private static final int CAPTURE_VIDEO_ACTIVITY_REQUEST_CODE = 200;
 
 
     @Override
@@ -78,8 +101,24 @@ public class FacebookActivity extends AppCompatActivity
                 FacebookActivity.this,
                 Arrays.asList("publish_actions"));*/
 
+        shareDialog = new ShareDialog(FacebookActivity.this);
+
+        image = BitmapFactory.decodeResource(context.getResources(), R.drawable.ic_launcher);
+
+
         setUpIds();
+
+     /*   Uri imageUri =UrifromFile(new File( "/storage/emulated/0/DCIM/Camera/IMG_20161128_020425.jpg";
+        try
+        {
+            Bitmap bitmap = MediaStore.Images.Media.getBitmap(this.getContentResolver(), imageUri);
+        } catch (IOException e)
+        {
+            e.printStackTrace();
+        }*/
+
     }
+
 
     private void setUpIds()
     {
@@ -169,6 +208,9 @@ public class FacebookActivity extends AppCompatActivity
                     Log.e(TAG, "getLastName   " + currentProfile.getLastName());
                     Log.e(TAG, "getLinkUri   " + currentProfile.getLinkUri());
                     Log.e(TAG, "getProfilePictureUri   " + currentProfile.getProfilePictureUri(500, 500));
+
+                    MySharedPreference.getInstance().saveUserName(context, currentProfile.getName());
+                    MySharedPreference.getInstance().saveUserImage(context, currentProfile.getProfilePictureUri(500, 500).toString());
                 }
             }
         };
@@ -177,7 +219,7 @@ public class FacebookActivity extends AppCompatActivity
 
     public void getFeeds(View view)
     {
-        GraphRequest request =  new GraphRequest(
+        GraphRequest request = new GraphRequest(
                 AccessToken.getCurrentAccessToken(),
                 "/me/feed",
                 null,
@@ -186,36 +228,39 @@ public class FacebookActivity extends AppCompatActivity
                 {
                     public void onCompleted(GraphResponse response)
                     {
-                         //handle the result
+
                         Log.e(TAG, "Feeds  " + response.getRawResponse());
 
 
                         try
                         {
-                            JSONObject jsonObject=new JSONObject(response.getRawResponse().toString());
-                            JSONArray jsonArray=jsonObject.getJSONArray(MyConstants.DATA);
+                            JSONObject jsonObject = new JSONObject(response.getRawResponse().toString());
+                            JSONArray jsonArray = jsonObject.getJSONArray(MyConstants.DATA);
 
-                            ArrayList<HashMap<String,String>> arrayList=new ArrayList<>();
+                            ArrayList<HashMap<String, String>> arrayList = new ArrayList<>();
                             for (int i = 0; i < jsonArray.length(); i++)
                             {
 
-                                JSONObject jsonObject1=jsonArray.getJSONObject(i);
+                                JSONObject jsonObject1 = jsonArray.getJSONObject(i);
 
-                                HashMap<String,String> map=new HashMap<>();
-                                map.put(MyConstants.ID,jsonObject1.getString(MyConstants.ID));
-                                map.put(MyConstants.CREATED_TIME,jsonObject1.getString(MyConstants.CREATED_TIME));
-                                map.put(MyConstants.NAME,jsonObject1.optString(MyConstants.NAME));
-                                map.put(MyConstants.TYPE,jsonObject1.getString(MyConstants.TYPE));
-                                map.put(MyConstants.PICTURE,jsonObject1.optString(MyConstants.PICTURE));
-                                map.put(MyConstants.STORY,jsonObject1.optString(MyConstants.STORY));
-                                map.put(MyConstants.MESSAGE,jsonObject1.optString(MyConstants.MESSAGE));
-                                map.put(MyConstants.LINK,jsonObject1.optString(MyConstants.LINK));
+                                HashMap<String, String> map = new HashMap<>();
+                                map.put(MyConstants.ID, jsonObject1.getString(MyConstants.ID));
+                                map.put(MyConstants.CREATED_TIME, jsonObject1.getString(MyConstants.CREATED_TIME));
+                                map.put(MyConstants.NAME, jsonObject1.optString(MyConstants.NAME));
+                                map.put(MyConstants.TYPE, jsonObject1.getString(MyConstants.TYPE));
+                                map.put(MyConstants.PICTURE, jsonObject1.optString(MyConstants.PICTURE));
+                                map.put(MyConstants.FULL_PICTURE, jsonObject1.optString(MyConstants.FULL_PICTURE));
+                                map.put(MyConstants.STORY, jsonObject1.optString(MyConstants.STORY));
+                                map.put(MyConstants.MESSAGE, jsonObject1.optString(MyConstants.MESSAGE));
+                                map.put(MyConstants.LINK, jsonObject1.optString(MyConstants.LINK));
 
+
+//                                Log.e(TAG, map + "");
 
                                 arrayList.add(map);
                             }
 
-                            if(!arrayList.isEmpty())
+                            if (!arrayList.isEmpty())
                             {
                                 setData(arrayList);
                             }
@@ -229,24 +274,25 @@ public class FacebookActivity extends AppCompatActivity
         );
 
 
-        Bundle bundle=new Bundle();
-        bundle.putString("fields","message,id,created_time,from,name,picture,object_id,type,link,story");
+        Bundle bundle = new Bundle();
+        bundle.putString("fields", "message,id,created_time,from,name,picture,object_id,type,link,story,full_picture,icon");
         request.setParameters(bundle);
         request.executeAsync();
 
     }
 
-    ArrayList<HashMap<String,String>> mainArrayList=new ArrayList<>();
+    ArrayList<HashMap<String, String>> mainArrayList = new ArrayList<>();
+
     private void setData(ArrayList<HashMap<String, String>> arrayList)
     {
-        if(mainArrayList.isEmpty())
+        if (mainArrayList.isEmpty())
         {
             mainArrayList.addAll(arrayList);
             setUpRecyclerView(mainArrayList);
         }
         else
         {
-            mainArrayList.addAll(arrayList);
+            mainArrayList=arrayList;
             facebookRecyclerViewAdapter.refresh(mainArrayList);
         }
     }
@@ -254,7 +300,7 @@ public class FacebookActivity extends AppCompatActivity
 
     private void setUpRecyclerView(ArrayList<HashMap<String, String>> mainArrayList)
     {
-        facebookRecyclerViewAdapter = new FacebookRecyclerViewAdapter(context,mainArrayList );
+        facebookRecyclerViewAdapter = new FacebookRecyclerViewAdapter(context, mainArrayList);
         recyclerView.setLayoutManager(new LinearLayoutManager(this));
         recyclerView.setAdapter(facebookRecyclerViewAdapter);
         recyclerView.setItemAnimator(new DefaultItemAnimator());
@@ -269,6 +315,132 @@ public class FacebookActivity extends AppCompatActivity
     }
 
 
+    public void postImage(View v)
+    {
+
+
+        SharePhoto photo = new SharePhoto.Builder()
+                .setBitmap(image)
+                .build();
+
+        SharePhotoContent content = new SharePhotoContent.Builder()
+                .addPhoto(photo)
+                .build();
+
+        shareDialog.show(content, ShareDialog.Mode.AUTOMATIC);
+
+
+    }
+
+    public void postStatus(View v)
+    {
+        if (ShareDialog.canShow(ShareLinkContent.class))
+        {
+            ShareLinkContent linkContent = new ShareLinkContent.Builder()
+                    //.setContentUrl(Uri.parse("http://developers.facebook.com/android"))
+                    .build();
+
+
+            shareDialog.show(linkContent);
+        }
+    }
+
+    public void postVideo(View v)
+    {
+        // create new Intentwith with Standard Intent action that can be
+        // sent to have the camera application capture an video and return it.
+        Intent intent = new Intent(MediaStore.ACTION_VIDEO_CAPTURE);
+
+        // create a file to save the video
+        fileUri = getOutputMediaFileUri(MEDIA_TYPE_VIDEO);
+
+        // set the image file name
+        intent.putExtra(MediaStore.EXTRA_OUTPUT, fileUri);
+
+        // set the video image quality to high
+        intent.putExtra(MediaStore.EXTRA_VIDEO_QUALITY, 1);
+
+        // start the Video Capture Intent
+        startActivityForResult(intent, CAPTURE_VIDEO_ACTIVITY_REQUEST_CODE);
+    }
+
+
+    /**
+     * Create a file Uri for saving an image or video
+     */
+    private Uri getOutputMediaFileUri(int type)
+    {
+
+        return Uri.fromFile(getOutputMediaFile(type));
+    }
+
+
+    /**
+     * Create a File for saving an image or video
+     */
+    private File getOutputMediaFile(int type)
+    {
+
+        // Check that the SDCard is mounted
+        File mediaStorageDir = new File(Environment.getExternalStoragePublicDirectory(
+                Environment.DIRECTORY_PICTURES), "MyCameraVideo");
+
+
+        // Create the storage directory(MyCameraVideo) if it does not exist
+        if (!mediaStorageDir.exists())
+        {
+
+            if (!mediaStorageDir.mkdirs())
+            {
+
+                Log.e(TAG, "Failed to create directory MyCameraVideo.");
+
+                Toast.makeText(context, "Failed to create directory MyCameraVideo.", Toast.LENGTH_LONG).show();
+
+                Log.e("MyCameraVideo", "Failed to create directory MyCameraVideo.");
+                return null;
+            }
+        }
+
+
+        // Create a media file name
+
+        // For unique file name appending current timeStamp with file name
+        java.util.Date date = new java.util.Date();
+        String timeStamp = new SimpleDateFormat("yyyyMMdd_HHmmss")
+                .format(date.getTime());
+
+        File mediaFile;
+
+        if (type == MEDIA_TYPE_VIDEO)
+        {
+
+            // For unique video file name appending current timeStamp with file name
+            mediaFile = new File(mediaStorageDir.getPath() + File.separator + "VID_" + timeStamp + ".mp4");
+
+        }
+        else
+        {
+            return null;
+        }
+
+        return mediaFile;
+    }
+
+
+
+    public void videoToFacebook(Uri data)
+    {
+        ShareVideo shareVideo = new ShareVideo.Builder()
+                  .setLocalUrl(data)
+                  .build();
+        ShareVideoContent content = new ShareVideoContent.Builder()
+                  .setVideo(shareVideo)
+                  .build();
+
+        shareDialog.show(content);
+    }
+
 
 
     @Override
@@ -276,6 +448,42 @@ public class FacebookActivity extends AppCompatActivity
     {
         super.onActivityResult(requestCode, resultCode, data);
         callbackManager.onActivityResult(requestCode, resultCode, data);
+
+
+        // After camera screen this code will excuted
+
+        if (requestCode == CAPTURE_VIDEO_ACTIVITY_REQUEST_CODE)
+        {
+
+            if (resultCode == RESULT_OK)
+            {
+
+                Log.e(TAG, "Video File : " + data.getData());
+
+                videoToFacebook(data.getData());
+
+                // Video captured and saved to fileUri specified in the Intent
+                Toast.makeText(this, "Video saved to: " + data.getData(), Toast.LENGTH_LONG).show();
+
+            }
+            else if (resultCode == RESULT_CANCELED)
+            {
+
+                Log.e(TAG, "User cancelled the video capture.");
+
+                // User cancelled the video capture
+                Toast.makeText(this, "User cancelled the video capture.", Toast.LENGTH_LONG).show();
+
+            }
+            else
+            {
+
+                Log.e(TAG, "Video capture failed.");
+
+                // Video capture failed, advise user
+                Toast.makeText(this, "Video capture failed.", Toast.LENGTH_LONG).show();
+            }
+        }
     }
 
 
