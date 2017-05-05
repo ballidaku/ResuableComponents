@@ -39,6 +39,8 @@
         <activity android:name=".myInstagram.AllMediaFiles" />
         <activity android:name=".myInstagram.Relationship" />
         <activity android:name="myInstagram.DashBoardActivty"/>
+        <activity android:name=".myInstagram.CommentsActivity"
+        android:theme="@style/Theme.AppCompat.Light.NoActionBar"/>
 
 
         <!--FACEBOOK-->

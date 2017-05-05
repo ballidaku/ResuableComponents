@@ -7,6 +7,8 @@ import android.content.pm.Signature;
 import android.util.Base64;
 import android.util.Log;
 
+import org.json.JSONObject;
+
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
@@ -17,6 +19,7 @@ import java.security.NoSuchAlgorithmException;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.HashMap;
 
 /**
  * Created by brst-pc93 on 4/28/17.
@@ -123,5 +126,19 @@ public class MyUtil
 
         return str;
     }
+
+    public static String convertHashMapToString(HashMap<String, String> map)
+    {
+        JSONObject obj = null;
+        try
+        {
+            obj = new JSONObject(map);
+        } catch (Exception e)
+        {
+            e.printStackTrace();
+        }
+        return obj.toString();
+    }
+
 
 }

@@ -41,6 +41,9 @@ public class AllMediaFiles extends Activity
     public static final String TAG_IMAGES = "images";
     public static final String TAG_THUMBNAIL = "thumbnail";
     public static final String TAG_URL = "url";
+
+
+
     private Handler handler = new Handler(new Callback()
     {
 
@@ -55,8 +58,7 @@ public class AllMediaFiles extends Activity
             }
             else
             {
-                Toast.makeText(context, "Check your network.",
-                          Toast.LENGTH_SHORT).show();
+                Toast.makeText(context, "Check your network.",Toast.LENGTH_SHORT).show();
             }
             return false;
         }
@@ -80,8 +82,9 @@ public class AllMediaFiles extends Activity
         gvAllImages.setAdapter(new MyGridListAdapter(context, mainList));
     }
 
-    private void getAllMediaImages()
+    public void getAllMediaImages()
     {
+        mainList.clear();
         pd = ProgressDialog.show(context, "", "Loading images...");
         new Thread(new Runnable()
         {
@@ -94,16 +97,8 @@ public class AllMediaFiles extends Activity
                 {
                     // URL url = new URL(mTokenUrl + "&code=" + code);
                     JSONParser jsonParser = new JSONParser();
-                    /*JSONObject jsonObject = jsonParser
-                              .getJSONFromUrlByGet("https://api.instagram.com/v1/users/"
-                                        + userInfo.get(InstagramApp.TAG_ID)
-                                        + "/media/recent/?client_id="
-                                        + Constants.CLIENT_ID
-                                        + "&count="
-                                        + userInfo.get(InstagramApp.TAG_COUNTS));*/
 
-
-//https://api.instagram.com/v1/users/self/media/recent?access_token=1507971356.2153477.cf8ba3f0fd494d5d815d42da3d6d983a
+                    //https://api.instagram.com/v1/users/self/media/recent?access_token=1507971356.2153477.cf8ba3f0fd494d5d815d42da3d6d983a
 
                     JSONObject jsonObject = jsonParser
                               .getJSONFromUrlByGet("https://api.instagram.com/v1/users/self/media/recent?access_token="
@@ -118,11 +113,12 @@ public class AllMediaFiles extends Activity
                         String likeCount = data_obj.getJSONObject("likes").getString("count");
                         String commentCount = data_obj.getJSONObject("comments").getString("count");
 
-                        JSONObject images_obj = data_obj
-                                  .getJSONObject(TAG_IMAGES);
+                        String media_id = data_obj.getString(MyConstants.MEDIA_ID);
+                        String USER_HAS_LIKED = data_obj.getString(MyConstants.USER_HAS_LIKED);
 
-                        JSONObject thumbnail_obj = images_obj
-                                  .getJSONObject(TAG_THUMBNAIL);
+                        JSONObject images_obj = data_obj.getJSONObject(TAG_IMAGES);
+
+                        JSONObject thumbnail_obj = images_obj.getJSONObject(TAG_THUMBNAIL);
 
                         // String str_height =
                         // thumbnail_obj.getString(TAG_HEIGHT);
@@ -137,6 +133,8 @@ public class AllMediaFiles extends Activity
                         map.put(MyConstants.IMAGE_URL,str_url);
                         map.put(MyConstants.LIKE_COUNT,likeCount);
                         map.put(MyConstants.COMMENT_COUNT,commentCount);
+                        map.put(MyConstants.MEDIA_ID,media_id);
+                        map.put(MyConstants.USER_HAS_LIKED,USER_HAS_LIKED);
 
                         mainList.add(map);
                     }

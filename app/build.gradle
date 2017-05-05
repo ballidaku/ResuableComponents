@@ -61,4 +61,6 @@ dependencies {
 
     compile 'com.github.lecho:hellocharts-library:1.5.8@aar'
 
+    compile 'com.squareup.okhttp:okhttp:2.4.0'
+
 }

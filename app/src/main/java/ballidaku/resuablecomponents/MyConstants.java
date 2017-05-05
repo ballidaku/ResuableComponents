@@ -26,4 +26,17 @@ public class MyConstants
     public static String IMAGE_URL="image_url";
     public static String LIKE_COUNT="like_count";
     public static String COMMENT_COUNT="comment_count";
+    public static String MEDIA_ID="id";
+    public static String LIKE="like";
+    public static String DELETE="delete";
+    public static String USER_HAS_LIKED="user_has_liked";
+    public static String COMMENT="comment";
+
+
+    public static String FULL_NAME="full_name";
+    public static String PROFILE_PICTURE="profile_picture";
+    public static String TEXT="text";
+    public static String FROM="from";
+
+    public static String ACCESS_TOKEN="access_token";
 }
