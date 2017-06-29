@@ -1,0 +1,37 @@
+//****************************************************************
+// Google Map Integration
+//****************************************************************
+
+1. Go to google api console : https://console.developers.google.com/apis/
+2. Create project
+3. After creating enable Google maps api
+4. In Credentials, there is API key.
+5. Under api key select Android Apps.
+6. Add package name and SHA-1
+
+To get SHA-1
+
+keytool -list -v -keystore ~/.android/debug.keystore -alias androiddebugkey -storepass android -keypass android
+
+In response we get
+
+Certificate fingerprints:
+         MD5:  44:72:CF:B5:8B:84:E4:4F:AC:54:DE:7A:91:5A:E1:0A
+         SHA1: FD:B8:91:81:68:D5:A6:A9:7C:63:F5:E2:83:A1:AA:D7:63:0E:2C:BD
+         SHA256: B7:FC:C2:7A:32:22:07:82:6D:9C:BA:59:C4:32:7A:65:54:9E:94:14:5C:D5:05:BB:97:6C:07:AB:A7:34:08:33
+         Signature algorithm name: SHA1withRSA
+         Version: 1
+
+
+In Java manifest :
+
+<meta-data android:name="com.google.android.geo.API_KEY"
+                   android:value="@string/google_maps_key"/>
+
+
+In build.gradle
+
+compile 'com.google.android.gms:play-services-maps:10.2.4'
+
+
+

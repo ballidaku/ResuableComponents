@@ -2,16 +2,19 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
           package="ballidaku.resuablecomponents">
 
-
+    <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION"/>
     <uses-permission android:name="android.permission.INTERNET"/>
     <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE"/>
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE"/>
 
     <!-- For android.media.audiofx.Visualizer -->
     <uses-permission android:name="android.permission.RECORD_AUDIO"/>
-    <!-- We will request access to the camera, saying we require a camera
-     of some sort but not one with autofocus capability. -->
+    <!--
+     We will request access to the camera, saying we require a camera
+     of some sort but not one with autofocus capability.
+    -->
     <uses-permission android:name="android.permission.CAMERA"/>
+
     <uses-feature android:name="android.hardware.camera"/>
 
     <application
@@ -29,31 +32,53 @@
                 <category android:name="android.intent.category.LAUNCHER"/>
             </intent-filter>
         </activity>
-
-
         <activity android:name=".myRealm.RealmActivity"/>
         <activity android:name=".myFacebook.FacebookActivity"/>
         <activity android:name=".myTwitter.TwitterActivity"/>
         <activity android:name=".myInstagram.InstagramActivity"/>
-
-        <activity android:name=".myInstagram.AllMediaFiles" />
-        <activity android:name=".myInstagram.Relationship" />
+        <activity android:name=".myInstagram.AllMediaFiles"/>
+        <activity android:name=".myInstagram.Relationship"/>
         <activity android:name="myInstagram.DashBoardActivty"/>
-        <activity android:name=".myInstagram.CommentsActivity"
-        android:theme="@style/Theme.AppCompat.Light.NoActionBar"/>
+        <activity
+            android:name=".myInstagram.CommentsActivity"
+            android:theme="@style/Theme.AppCompat.Light.NoActionBar"/>
+        <activity android:name=".myService.MyServiceDemo"/>
 
+        <!-- FACEBOOK -->
+        <meta-data
+            android:name="com.facebook.sdk.ApplicationId"
+            android:value="@string/facebook_app_id"/>
 
-        <!--FACEBOOK-->
-        <meta-data android:name="com.facebook.sdk.ApplicationId"
-                   android:value="@string/facebook_app_id"/>
-
-        <provider android:name="com.facebook.FacebookContentProvider"
-                  android:authorities="com.facebook.app.FacebookContentProvider317329475352213"
-                  android:exported="true"/>
+        <provider
+            android:name="com.facebook.FacebookContentProvider"
+            android:authorities="com.facebook.app.FacebookContentProvider317329475352213"
+            android:exported="true"/>
 
         <meta-data
             android:name="io.fabric.ApiKey"
             android:value="a1462321ee345aea57524258b5f439542eb2c377"/>
+
+        <!-- SERVICE -->
+        <service android:name=".myService.MyIntentService"/>
+        <service android:name=".myService.LocalWordService"/>
+
+        <activity android:name=".myService.MyIntentServiceActivity">
+        </activity>
+        <activity android:name=".myService.MyServiceActivity">
+        </activity>
+        <activity android:name=".myLocation.GetLocation">
+        </activity>
+        <activity android:name=".myMaps.MapActivity">
+        </activity>
+
+
+
+        <!-- API key for the Android Maps API v2. The value is defined as a string resource. -->
+        <meta-data android:name="com.google.android.geo.API_KEY"
+                   android:value="@string/google_maps_key"/>
+
+
+
     </application>
 
 </manifest>

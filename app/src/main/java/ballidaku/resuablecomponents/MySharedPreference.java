@@ -17,14 +17,10 @@ public class MySharedPreference
     {
     }
 
-    public static MySharedPreference instance = null;
+    public static MySharedPreference instance = new MySharedPreference();
 
     public static MySharedPreference getInstance()
     {
-        if (instance == null)
-        {
-            instance = new MySharedPreference();
-        }
         return instance;
     }
 
