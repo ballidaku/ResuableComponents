@@ -9,6 +9,7 @@ import android.view.View;
 import ballidaku.resuablecomponents.myFacebook.FacebookActivity;
 import ballidaku.resuablecomponents.myInstagram.InstagramActivity;
 import ballidaku.resuablecomponents.myLocation.GetLocation;
+import ballidaku.resuablecomponents.myMaps.MapActivity;
 import ballidaku.resuablecomponents.myRealm.RealmActivity;
 import ballidaku.resuablecomponents.myService.MyServiceDemo;
 import ballidaku.resuablecomponents.myTwitter.TwitterActivity;
@@ -96,7 +97,7 @@ public class MainScreen extends AppCompatActivity
     public void maps(View v)
     {
 
-        // startActivity(new Intent(context, MapActivity.class));
+         startActivity(new Intent(context, MapActivity.class));
 
 //        TheDemo theDemo = new TheDemo();
         // new TestThread("THREAD 1", theDemo);

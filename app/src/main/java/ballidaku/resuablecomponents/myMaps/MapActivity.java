@@ -8,6 +8,7 @@ import android.graphics.Bitmap;
 import android.graphics.Canvas;
 import android.graphics.drawable.Drawable;
 import android.location.Location;
+import android.location.LocationManager;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
@@ -17,6 +18,7 @@ import android.support.v4.app.FragmentActivity;
 import android.support.v4.content.ContextCompat;
 import android.support.v4.graphics.drawable.DrawableCompat;
 import android.support.v7.app.AlertDialog;
+import android.util.Log;
 import android.view.animation.AccelerateDecelerateInterpolator;
 import android.view.animation.Interpolator;
 import android.view.animation.LinearInterpolator;
@@ -57,9 +59,9 @@ public class MapActivity extends FragmentActivity implements OnMapReadyCallback,
 
     Context context;
 
-    ArrayList<LatLng> list=new ArrayList<>();
+    ArrayList<LatLng> list = new ArrayList<>();
 
-    int count=0;
+    int count = 0;
 
 
     @Override
@@ -67,7 +69,7 @@ public class MapActivity extends FragmentActivity implements OnMapReadyCallback,
     {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_map);
-        context=this;
+        context = this;
 
 
         list.add(new LatLng(30.708254, 76.691812));
@@ -76,6 +78,8 @@ public class MapActivity extends FragmentActivity implements OnMapReadyCallback,
         list.add(new LatLng(30.709075, 76.691099));
         list.add(new LatLng(30.709054, 76.690975));
         list.add(new LatLng(30.708939, 76.690788));
+        list.add(new LatLng(30.709054, 76.690975));
+        list.add(new LatLng(30.708457, 76.691627));
 
 
         SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager().findFragmentById(R.id.map);
@@ -105,6 +109,7 @@ public class MapActivity extends FragmentActivity implements OnMapReadyCallback,
         mMap.setIndoorEnabled(false);
         mMap.setBuildingsEnabled(true);
         mMap.getUiSettings().setZoomControlsEnabled(false);
+        mMap.getUiSettings().setRotateGesturesEnabled(false);
 
         //Initialize Google Play Services
         if (android.os.Build.VERSION.SDK_INT >= Build.VERSION_CODES.M)
@@ -129,9 +134,6 @@ public class MapActivity extends FragmentActivity implements OnMapReadyCallback,
 
 
         smoothScroll();
-
-
-
 
 
         // Add a marker in Sydney, Australia, and move the camera.
@@ -295,25 +297,31 @@ public class MapActivity extends FragmentActivity implements OnMapReadyCallback,
     }
 
 
-     public void refreshMapUI(LatLng currentLatLng)
+    public void refreshMapUI(LatLng currentLatLng)
     {
         mMap.moveCamera(CameraUpdateFactory.newLatLng(currentLatLng));
         mMap.moveCamera(CameraUpdateFactory.newCameraPosition(new CameraPosition.Builder()
                   .target(mMap.getCameraPosition().target)
                   .zoom(17)
-                  .bearing(30)
-                  //.tilt(45)
+                  //.bearing(30)
+                  //.tilt(270)
                   .build()));
 
         mCurrLocationMarker = mMap.addMarker(new MarkerOptions()
                   .position(currentLatLng)
-                  .icon(BitmapDescriptorFactory.fromBitmap(getBitmapFromVectorDrawable(context,R.drawable.ic_sedan_car_model)))
-                  .title("Hello world"));
+                  .icon(BitmapDescriptorFactory.fromResource(R.mipmap.ic_c))
+                  .anchor(0.5f, 0.5f)
+//                  .flat(true)
+                  //.icon(BitmapDescriptorFactory.fromBitmap(getBitmapFromVectorDrawable(context,R.drawable.ic_sedan_car_model)))
+
+                  /*.title("Hello world")*/);
     }
 
-    public  Bitmap getBitmapFromVectorDrawable(Context context, int drawableId) {
+    public Bitmap getBitmapFromVectorDrawable(Context context, int drawableId)
+    {
         Drawable drawable = ContextCompat.getDrawable(context, drawableId);
-        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.LOLLIPOP) {
+        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.LOLLIPOP)
+        {
             drawable = (DrawableCompat.wrap(drawable)).mutate();
         }
 
@@ -325,8 +333,6 @@ public class MapActivity extends FragmentActivity implements OnMapReadyCallback,
 
         return bitmap;
     }
-
-
 
 
     /*public void running(final LatLng currentLatLng)
@@ -349,21 +355,23 @@ public class MapActivity extends FragmentActivity implements OnMapReadyCallback,
 
 
     }*/
-
+    LatLng previousLatLong;
 
     public void smoothScroll()
     {
 
 
-       // final LatLng SomePos = new LatLng(12.7796354, 77.4159606);
+        // final LatLng SomePos = new LatLng(12.7796354, 77.4159606);
 
 
         final LatLng currentLatLng = new LatLng(30.708200, 76.691737);
 
-       // final LatLng endLatLng = new LatLng(30.708858, 76.690625);
+        // final LatLng endLatLng = new LatLng(30.708858, 76.690625);
 
         refreshMapUI(currentLatLng);
 
+
+        previousLatLong = currentLatLng;
 
         try
         {
@@ -411,6 +419,15 @@ public class MapActivity extends FragmentActivity implements OnMapReadyCallback,
                     count++;
 
 
+                    float bearing = getLocation(previousLatLong).bearingTo(getLocation(list.get(count)));
+
+                    //float bearing = prevLoc.bearingTo(newLoc) ;
+                    mCurrLocationMarker.setRotation(bearing);
+
+
+                    previousLatLong = list.get(count);
+
+
                     handler.post(new Runnable()
                     {
                         long elapsed;
@@ -425,24 +442,18 @@ public class MapActivity extends FragmentActivity implements OnMapReadyCallback,
                             t = elapsed / durationInMs;
 
 
+                            LatLng currentPosition = new LatLng(
+                                      startPosition.latitude * (1 - t) + list.get(count).latitude * t,
+                                      startPosition.longitude * (1 - t) + list.get(count).longitude * t);
 
 
+                            mCurrLocationMarker.setPosition(currentPosition);
 
 
-                            if(list.size()>= count)
-                            {
-
-                                LatLng currentPosition = new LatLng(
-                                          startPosition.latitude * (1 - t) + list.get(count).latitude * t,
-                                          startPosition.longitude * (1 - t) + list.get(count).longitude * t);
-
-                                rotateMarker(mCurrLocationMarker, (float) bearingBetweenLocations(currentLatLng, list.get(count)));
-
-                                mCurrLocationMarker.setPosition(currentPosition);
+                            //rotateMarker(mCurrLocationMarker, (float) bearingBetweenLocations(currentLatLng, list.get(count)));
 
 
-                            }
-                           // running(endLatLng);
+                            // running(endLatLng);
                             // Repeat till progress is complete.
                             if (t < 1)
                             {
@@ -474,6 +485,16 @@ public class MapActivity extends FragmentActivity implements OnMapReadyCallback,
         {
             e.printStackTrace();
         }
+    }
+
+
+    public Location getLocation(LatLng latLng)
+    {
+
+        Location temp = new Location(LocationManager.GPS_PROVIDER);
+        temp.setLatitude(latLng.latitude);
+        temp.setLongitude(latLng.longitude);
+        return temp;
     }
 
 
@@ -523,6 +544,8 @@ public class MapActivity extends FragmentActivity implements OnMapReadyCallback,
 
                     float rot = t * toRotation + (1 - t) * startRotation;
 
+                    Log.e("rot", "" + rot);
+
                     marker.setRotation(-rot > 180 ? rot / 2 : rot);
                     if (t < 1.0)
                     {
@@ -537,9 +560,6 @@ public class MapActivity extends FragmentActivity implements OnMapReadyCallback,
             });
         }
     }
-
-
-
 
 
 }
