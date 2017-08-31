@@ -71,14 +71,15 @@
         <activity android:name=".myMaps.MapActivity">
         </activity>
 
-
-
         <!-- API key for the Android Maps API v2. The value is defined as a string resource. -->
-        <meta-data android:name="com.google.android.geo.API_KEY"
-                   android:value="@string/google_maps_key"/>
+        <meta-data
+            android:name="com.google.android.geo.API_KEY"
+            android:value="@string/google_maps_key"/>
 
-
-
+        <activity android:name=".locateOtherOnMap.LoginActivity">
+        </activity>
+        <activity android:name=".dragableRecyclerView.DragableRecyclerActivity">
+        </activity>
     </application>
 
 </manifest>

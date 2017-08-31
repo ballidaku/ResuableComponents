@@ -6,6 +6,8 @@ import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.view.View;
 
+import ballidaku.resuablecomponents.dragableRecyclerView.DragableRecyclerActivity;
+import ballidaku.resuablecomponents.locateOtherOnMap.LoginActivity;
 import ballidaku.resuablecomponents.myFacebook.FacebookActivity;
 import ballidaku.resuablecomponents.myInstagram.InstagramActivity;
 import ballidaku.resuablecomponents.myLocation.GetLocation;
@@ -94,6 +96,11 @@ public class MainScreen extends AppCompatActivity
         startActivity(new Intent(context, GetLocation.class));
     }
 
+    public void userOnMaps(View v)
+    {
+        startActivity(new Intent(context, LoginActivity.class));
+    }
+
     public void maps(View v)
     {
 
@@ -108,6 +115,13 @@ public class MainScreen extends AppCompatActivity
 //        theDemo.test("THREAD 1","THREAD 1");
 //        theDemo.test("THREAD 2","THREAD 2");
 //        theDemo.test("THREAD 3","THREAD 3");
+    }
+
+
+    public void dragableRecyclerView(View v)
+    {
+
+        startActivity(new Intent(context, DragableRecyclerActivity.class));
     }
 
    /* public class SOP

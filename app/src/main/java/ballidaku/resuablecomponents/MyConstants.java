@@ -39,4 +39,9 @@ public class MyConstants
     public static String FROM="from";
 
     public static String ACCESS_TOKEN="access_token";
+
+    //Firebase
+    public static String USER_NAME="user_name";
+    public static String USER_TYPE="user_type";
+    public static String USERS="users";
 }
